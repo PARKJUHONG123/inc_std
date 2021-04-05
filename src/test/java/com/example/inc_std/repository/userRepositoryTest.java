@@ -3,9 +3,15 @@ package com.example.inc_std.repository;
 import com.example.inc_std.IncStdApplicationTests;
 import com.example.inc_std.model.entity.User;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public class userRepositoryTest extends IncStdApplicationTests {
 
@@ -30,15 +36,53 @@ public class userRepositoryTest extends IncStdApplicationTests {
         System.out.println(userFromDB);
     }
 
+    @Test
     public void read() {
-
+        Optional<User> user = userRepository.findById(2L); // ID 가 LONG 이기 때문에
+        user.ifPresent(selectUser -> { // user 가 있으면 (ifPresent) selectUser 로 찍어보겠음
+            System.out.println("user : " + selectUser); // selectUser 라는 객체 명으로 user 가 return 됨
+            System.out.println("email : " + selectUser.getEmail());
+        });
     }
 
+    @Test
+    public User read(@RequestParam Long id) {
+        Optional<User> user = userRepository.findById(id); // ID 가 LONG 이기 때문에
+        user.ifPresent(selectUser -> { // user 가 있으면 (ifPresent) selectUser 로 찍어보겠음
+            System.out.println("user : " + selectUser); // selectUser 라는 객체 명으로 user 가 return 됨
+            System.out.println("email : " + selectUser.getEmail());
+        });
+
+        return user.get(); // REST 와 CRUD 를 연결해서 사용할 수 있음
+    }
+
+    @Test
     public void update() {
+        Optional<User> user = userRepository.findById(2L);
 
+        user.ifPresent(selectUser -> { // user 가 있으면 (ifPresent) selectUser 로 찍어보겠음
+            selectUser.setAccount("ORANGE");
+            selectUser.setUpdatedAt(LocalDateTime.now());
+            selectUser.setUpdatedBy("update method()");
+
+            userRepository.save(selectUser);
+            // JPA 에서는 해당 ID 가 있는지 확인하고, 없으면 CREATE 와 마찬가지로 동작
+        });
     }
 
-    public void delete() {
+    // @DeleteMapping("/api/user")
+    @Test
+    @Transactional // 실행은 되지만, 마지막에 ROLLBACK 을 해주는 기능
+    public void delete() { // (@RequestParam Long id) {
+        Optional<User> user = userRepository.findById(1L);
 
+        Assertions.assertTrue(user.isPresent()); // 삭제할 데이터가 존재하는 경우 정상동작, 없을 경우 Error
+
+        user.ifPresent(selectUser -> {
+            userRepository.delete(selectUser);
+        });
+
+        Optional<User> deleteUser = userRepository.findById(1L);
+        Assertions.assertFalse(deleteUser.isPresent());  // 삭제할 데이터가 존재하지 않는 경우 정상동작, 있을 경우 Error
     }
 }
