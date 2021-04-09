@@ -23,7 +23,15 @@ public class Item {
     private String content;
 
     // 1 : N
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "item")
+    // LAZY = 지연로딩, EAGER = 즉시로딩
+
+    // LAZY = SELECT * FROM ITEM WHERE ID = ?
+
+    // EAGER (1 : 1 연관 관계일 때 사용함)
+    // ITEM_ID = ORDER_DETAIL.ITEM_ID
+    // USER-ID = ORDER_DETAIL.USER_ID
+    // 연관 관계가 이루어진 모든 테이블에 대해서 조인을 걸어서 가져옴
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "item")
     private List<OrderDet> orderDetList;
 
     public Long getId() {

@@ -40,7 +40,7 @@ public class userRepositoryTest extends IncStdApplicationTests {
     @Test
     @Transactional
     public void read() {
-        Optional<User> user = userRepository.findById(1L); // ID 가 LONG 이기 때문에
+        Optional<User> user = userRepository.findByAccount("TestUser03"); // ID 가 LONG 이기 때문에
         user.ifPresent(selectUser -> { // user 가 있으면 (ifPresent) selectUser 로 찍어보겠음
             System.out.println("user : " + selectUser); // selectUser 라는 객체 명으로 user 가 return 됨
             System.out.println("email : " + selectUser.getEmail());
