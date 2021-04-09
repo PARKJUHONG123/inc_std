@@ -18,8 +18,8 @@ public class OrderDetRepositoryTest extends IncStdApplicationTests {
         OrderDet orderDet = new OrderDet();
 
         orderDet.setOrderAt(LocalDateTime.now());
-        orderDet.setUserId(4L); // 어떤 사람
-        orderDet.setItemId(1L); // 어떤 상품
+//        orderDet.setUserId(4L); // 어떤 사람 // Long 에서 User 로 바뀌었기 때문
+//        orderDet.setItemId(1L); // 어떤 상품
 
         OrderDet newOrderDet = orderDetRepository.save(orderDet);
         Assertions.assertNotNull(newOrderDet);

@@ -1,6 +1,7 @@
 package com.example.inc_std.repository;
 
 import com.example.inc_std.IncStdApplicationTests;
+import com.example.inc_std.model.entity.Item;
 import com.example.inc_std.model.entity.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
@@ -37,20 +38,33 @@ public class userRepositoryTest extends IncStdApplicationTests {
     }
 
     @Test
+    @Transactional
     public void read() {
-        Optional<User> user = userRepository.findById(2L); // ID 가 LONG 이기 때문에
+        Optional<User> user = userRepository.findById(1L); // ID 가 LONG 이기 때문에
         user.ifPresent(selectUser -> { // user 가 있으면 (ifPresent) selectUser 로 찍어보겠음
             System.out.println("user : " + selectUser); // selectUser 라는 객체 명으로 user 가 return 됨
             System.out.println("email : " + selectUser.getEmail());
+            selectUser.getOrderDetList().stream().forEach(detail -> {
+                Item item = detail.getItem();
+                System.out.println(item);
+            });
         });
+
     }
 
     @Test
+    @Transactional //
     public User read(@RequestParam Long id) {
         Optional<User> user = userRepository.findById(id); // ID 가 LONG 이기 때문에
         user.ifPresent(selectUser -> { // user 가 있으면 (ifPresent) selectUser 로 찍어보겠음
             System.out.println("user : " + selectUser); // selectUser 라는 객체 명으로 user 가 return 됨
             System.out.println("email : " + selectUser.getEmail());
+
+            selectUser.getOrderDetList().stream().forEach(detail -> {
+                // System.out.println(detail.getItem());
+                Item item = detail.getItem();
+                System.out.println(item);
+            });
         });
 
         return user.get(); // REST 와 CRUD 를 연결해서 사용할 수 있음

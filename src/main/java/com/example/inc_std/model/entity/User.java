@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data // 객체로 사용할 것이기 때문에
 @AllArgsConstructor // 파라미터를 모두 포함한 생성자와 각 인스턴스에 대해서 GET, SET METHOD 가 만들어짐
@@ -27,6 +28,10 @@ public class User {
     private String createdBy;
     private LocalDateTime updatedAt;
     private String updatedBy;
+
+    // 1 : N
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private List<OrderDet> orderDetList;
 
 
     // 원래는 LOMBOK 으로 자동 생성되지만, 내 PC 에서는 버전 차이로 인해서 동작하지 않음
@@ -85,6 +90,15 @@ public class User {
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
     }
+
+    public List<OrderDet> getOrderDetList() {
+        return orderDetList;
+    }
+
+    public void setOrderDetList(List<OrderDet> orderDetList) {
+        this.orderDetList = orderDetList;
+    }
+
 }
 
 

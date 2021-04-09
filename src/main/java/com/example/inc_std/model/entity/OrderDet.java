@@ -3,17 +3,16 @@ package com.example.inc_std.model.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity // order_detail 에 자동 MAPPING
+@ToString(exclude = {"user", "item"})
 public class OrderDet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,9 +20,15 @@ public class OrderDet {
 
     private LocalDateTime orderAt;
 
-    private Long userId;
+    // private Long userId;
+    // N : 1
+    @ManyToOne
+    private User user; // Hibernate 가 user_id 를 찾아감
 
-    private Long ItemId;
+
+    // N : 1
+    @ManyToOne
+    private Item item;
 
     public Long getId() {
         return id;
@@ -41,6 +46,7 @@ public class OrderDet {
         this.orderAt = orderAt;
     }
 
+    /*
     public Long getUserId() {
         return userId;
     }
@@ -56,4 +62,22 @@ public class OrderDet {
     public void setItemId(Long itemId) {
         ItemId = itemId;
     }
+    */
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Item getItem() {
+        return item;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
+    }
+
 }
