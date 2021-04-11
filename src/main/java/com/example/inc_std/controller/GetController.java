@@ -12,6 +12,7 @@ public class GetController {
         return "Hi, getMethod";
     }
 
+    // @getMapping 어노테이션은 @RequestMapping과 다르게 메소드를 지정하지 않아도 되고, 주소만 설정해주면 됨
     @GetMapping("/getParameter") // localhost:8080/api/getParameter?id=1234&password=abcd
     public String getParameter(@RequestParam String id, @RequestParam String password) {
         // String password = "bbbb"; // 스프링에서는 매개변수와 지역변수 명이 같은 것을 허용하지 않음

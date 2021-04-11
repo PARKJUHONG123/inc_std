@@ -15,5 +15,6 @@ public interface UserRepository extends JpaRepository<User, Long> { // User의 R
     Optional<User> findByEmail(String email);
 
     // SELECT * FROM WHERE ACCOUNT = ? AND EMAIL = ?
+    // QueryMethod : 데이터베이스의 값을 가져올 때 값은 아래와 같이 여러 개의 값으로 불러올 수 있음
     Optional<User> findByAccountAndEmail(String account, String email);
 }

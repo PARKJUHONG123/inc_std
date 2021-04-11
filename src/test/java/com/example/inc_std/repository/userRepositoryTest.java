@@ -17,6 +17,7 @@ import java.util.Optional;
 public class userRepositoryTest extends IncStdApplicationTests {
 
     @Autowired // Spring 의 DI (Dependency Injection) - 직접 객체를 만들지 않고, 스프링이 직접 관리함
+    // 스프링 프레임워크에서 개발자가 객체들을 직접 만들지 않고 스프링이 직접 관리를 하는 것을 Dependency Injection ( DI ) 의존성 주입
     private UserRepository userRepository; // = new UserRepository(); 를 생략할 수 있음
     // Application 실행 시 스프링이 Autowired 로 Annotation 된 객체를 찾아서 자동으로 객체를 만들어 줌
     // Singleton 디자인 패턴을 사용함

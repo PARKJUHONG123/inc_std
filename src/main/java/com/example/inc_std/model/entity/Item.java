@@ -31,6 +31,7 @@ public class Item {
     // ITEM_ID = ORDER_DETAIL.ITEM_ID
     // USER-ID = ORDER_DETAIL.USER_ID
     // 연관 관계가 이루어진 모든 테이블에 대해서 조인을 걸어서 가져옴
+    // FetchType 중 EAGER 타입은 연관관계로 설정된 모든 테이블에 대해서 Join이 일어나고, 모든 데이터를 가져오기 때문에 성능의 저하와 데이터를 가져오지 못하는 이슈가 생길 수 있음
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "item")
     private List<OrderDet> orderDetList;
 
