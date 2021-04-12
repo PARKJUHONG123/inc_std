@@ -24,8 +24,8 @@ public class OrderDetailRepositoryTest extends IncStdApplicationTests {
         orderDetail.setQuantity(1);
         orderDetail.setTotalPrice(BigDecimal.valueOf(900000));
 
-        orderDetail.setOrderGroupId(4L); // 어떠한 장바구니에
-        orderDetail.setItemId(1L); // 어떠한 상품이 들어감
+        // orderDetail.setOrderGroupId(4L); // 어떠한 장바구니에
+        // orderDetail.setItemId(1L); // 어떠한 상품이 들어감
 
         orderDetail.setCreatedAt(LocalDateTime.now());
         orderDetail.setCreatedBy("AdminServer");

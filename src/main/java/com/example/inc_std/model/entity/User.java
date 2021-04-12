@@ -1,8 +1,12 @@
 package com.example.inc_std.model.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.Accessors;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -13,6 +17,11 @@ import java.util.List;
 @NoArgsConstructor // 파라미터가 없는 생성자 자동 생성
 @Entity // = DB의 table (해당 Class 가 Entity 임을 명시)
 @Table(name = "user") // 와 같이 테이블을 지정해줄 수 있다 (이름이 다를 경우) (실제 DB 테이블의 이름 명시)
+@ToString(exclude = {"orderGroupList"})
+@EntityListeners(AuditingEntityListener.class) // 클래스가 LoginUserAuditorAware 에 의해 감시받음
+@Builder // 생성자 Pattern 으로, 원하는 만큼의 파라미터를 가진 생성자 생성가능
+@Accessors(chain = true) // chaining 된 형태로 객체를 생성할 수 있음
+
 public class User {
     @Id // 구분자를 선언해줘야 함 (Index Primary Key)
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Primary key 식별키의 전략 설정 (Mysql 은 Identity)
@@ -34,13 +43,18 @@ public class User {
 
     private LocalDateTime unregisteredAt;
 
+    @CreatedDate
     private LocalDateTime createdAt;
 
+    @CreatedBy // LoginUserAuditorAware 의 adminUser 에 의해 적용됨
     private String createdBy;
 
+    @LastModifiedDate
     private LocalDateTime updatedAt;
 
+    @LastModifiedBy
     private String updatedBy;
+
 
     /*
 
@@ -49,6 +63,11 @@ public class User {
     private List<OrderDet> orderDetList;
 
      */
+
+    // User 1 : N OrderGroup
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private List<OrderGroup> orderGroupList; // OneToMany 임으로 List 형태로
 }
 
 

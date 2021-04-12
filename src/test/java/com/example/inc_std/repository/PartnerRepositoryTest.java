@@ -38,7 +38,7 @@ public class PartnerRepositoryTest extends IncStdApplicationTests {
         partner.setRegisteredAt(registeredAt);
         partner.setCreatedAt(createdAt); // LoginUserAuditorAware 적용으로 자동 createdAt, createdBy 설정
         partner.setCreatedBy(createdBy); // LoginUserAuditorAware 적용으로 자동 createdAt, createdBy 설정
-        partner.setCategoryId(categoryId);
+//        partner.setCategoryId(categoryId);
 
         Partner newPartner = partnerRepository.save(partner);
         Assertions.assertNotNull(newPartner);

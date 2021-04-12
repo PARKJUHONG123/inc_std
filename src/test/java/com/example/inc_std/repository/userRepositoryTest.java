@@ -3,6 +3,7 @@ package com.example.inc_std.repository;
 import com.example.inc_std.IncStdApplicationTests;
 import com.example.inc_std.model.entity.Item;
 import com.example.inc_std.model.entity.User;
+import lombok.Builder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+@Builder // 생성자 Pattern 으로, 원하는 만큼의 파라미터를 가진 생성자 생성가능
 public class userRepositoryTest extends IncStdApplicationTests {
 
     @Autowired
@@ -40,13 +42,58 @@ public class userRepositoryTest extends IncStdApplicationTests {
         user.setCreatedAt(createdAt);
         user.setCreatedBy(createdBy);
 
+        User builderUser = User.builder()
+                .account(account)
+                .status(status)
+                .email(email)
+                .build(); // builder 를 통해 생성자 생성
+
         User newUser = userRepository.save(user);
         Assertions.assertNotNull(newUser);
     }
 
+    @Test
+    @Transactional // rollback
     public void read() {
         Optional<User> user = userRepository.findFirstByPhoneNumberOrderByIdDesc("000-1111-2222");
+
+
+        user.ifPresent(selectUser -> {
+            System.out.println(selectUser.getEmail());
+
+            /*
+            // chain 패턴의 업데이트
+            selectUser.setEmail("")
+                    .setPhoneNumber("")
+                    .setStatus("")
+                    ;
+
+            // chain 패턴의 생성자 생성
+            User chainUser = new User().setAccount("").setEmail("").setPassword("");
+             */
+
+            selectUser.getOrderGroupList().forEach(orderGroup -> {
+                System.out.println("----------------------주문묶음----------------------");
+                System.out.println("수령인 : " + orderGroup.getRevName());
+                System.out.println("수령지 : " + orderGroup.getRevAddress());
+                System.out.println("총금액 : " + orderGroup.getTotalPrice());
+                System.out.println("총수량 : " + orderGroup.getTotalQuantity());
+
+                System.out.println("----------------------주문상세----------------------");
+                orderGroup.getOrderDetailList().forEach(orderDetail -> {
+                    System.out.println("파트너사 이름 : " + orderDetail.getItem().getPartner().getName());
+                    System.out.println("파트너사 카테코리 : " + orderDetail.getItem().getPartner().getCategory().getTitle());
+                    System.out.println("주문 상품 : " + orderDetail.getItem().getName());
+                    System.out.println("주문의 상태 : " + orderDetail.getStatus());
+                    System.out.println("도착 예정 일자 : " + orderDetail.getArrivalDate());
+                    System.out.println("고객센터 번호 : " + orderDetail.getItem().getPartner().getCallCenter());
+                });
+            });
+        });
+
         Assertions.assertNotNull(user);
+
+
     }
 
     /*

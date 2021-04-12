@@ -29,7 +29,7 @@ public class OrderGroupRepositoryTest extends IncStdApplicationTests {
         orderGroup.setCreatedAt(LocalDateTime.now());
         orderGroup.setCreatedBy("AdminServer");
 
-        orderGroup.setUserId(3L);
+        // orderGroup.setUserId(3L);
 
         OrderGroup newOrderGroup = orderGroupRepository.save(orderGroup);
         Assertions.assertNotNull(newOrderGroup);
