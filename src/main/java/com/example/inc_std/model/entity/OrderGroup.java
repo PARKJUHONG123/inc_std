@@ -35,7 +35,7 @@ public class OrderGroup {
 
     private Integer totalQuantity;
 
-    private LocalDateTime orderedAt;
+    private LocalDateTime orderAt;
 
     private LocalDateTime arrivalDate;
 
@@ -46,4 +46,6 @@ public class OrderGroup {
     private LocalDateTime updatedAt;
 
     private String updatedBy;
+
+    private Long userId;
 }
