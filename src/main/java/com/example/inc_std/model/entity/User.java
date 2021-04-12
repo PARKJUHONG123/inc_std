@@ -21,84 +21,34 @@ public class User {
     // JPA 의 Entity 및 Column 은 자동으로 camelCase 를 DB 의 snake_case 로 매칭해줌
     @Column(name = "account") // 와 같이 칼럼을 지정해줄 수 있다 (이름이 다를 경우) (실제 DB Column 의 이름 명시)
     private String account;
+
+    private String password;
+
+    private String status;
+
     private String email;
 
     private String phoneNumber; // JPA 에서 자동으로 DB의 phone_number 를 phoneNumber 로 연결해줌
+
+    private LocalDateTime registeredAt;
+
+    private LocalDateTime unregisteredAt;
+
     private LocalDateTime createdAt;
+
     private String createdBy;
+
     private LocalDateTime updatedAt;
+
     private String updatedBy;
+
+    /*
 
     // 1 : N
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<OrderDet> orderDetList;
 
-
-    // 원래는 LOMBOK 으로 자동 생성되지만, 내 PC 에서는 버전 차이로 인해서 동작하지 않음
-    public String getAccount() {
-        return account;
-    }
-
-    public void setAccount(String account) {
-        this.account = account;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
-    public List<OrderDet> getOrderDetList() {
-        return orderDetList;
-    }
-
-    public void setOrderDetList(List<OrderDet> orderDetList) {
-        this.orderDetList = orderDetList;
-    }
-
+     */
 }
 
 

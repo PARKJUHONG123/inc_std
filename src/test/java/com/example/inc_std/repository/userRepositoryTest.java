@@ -16,6 +16,41 @@ import java.util.Optional;
 
 public class userRepositoryTest extends IncStdApplicationTests {
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Test
+    public void create() {
+        String account = "Test01";
+        String password = "Test01";
+        String status = "REGISTERED";
+        String email = "Test01@gmail.com";
+        String phoneNumber = "000-1111-2222";
+        LocalDateTime registeredAt = LocalDateTime.now();
+        LocalDateTime createdAt = LocalDateTime.now();
+        String createdBy = "AdminServer";
+
+        User user = new User();
+        user.setAccount(account);
+        user.setPassword(password);
+        user.setStatus(status);
+        user.setEmail(email);
+        user.setPhoneNumber(phoneNumber);
+        user.setRegisteredAt(registeredAt);
+        user.setCreatedAt(createdAt);
+        user.setCreatedBy(createdBy);
+
+        User newUser = userRepository.save(user);
+        Assertions.assertNotNull(newUser);
+    }
+
+    public void read() {
+        Optional<User> user = userRepository.findFirstByPhoneNumberOrderByIdDesc("000-1111-2222");
+        Assertions.assertNotNull(user);
+    }
+
+    /*
+
     @Autowired // Spring 의 DI (Dependency Injection) - 직접 객체를 만들지 않고, 스프링이 직접 관리함
     // 스프링 프레임워크에서 개발자가 객체들을 직접 만들지 않고 스프링이 직접 관리를 하는 것을 Dependency Injection ( DI ) 의존성 주입
     private UserRepository userRepository; // = new UserRepository(); 를 생략할 수 있음
@@ -36,6 +71,7 @@ public class userRepositoryTest extends IncStdApplicationTests {
 
         User userFromDB = userRepository.save(user); // JPA 에서 만든 user 를 연결된 DB 에 저장한 후, DB 내 저장된 객체를 return 함
         System.out.println(userFromDB);
+
     }
 
     @Test
@@ -50,7 +86,6 @@ public class userRepositoryTest extends IncStdApplicationTests {
                 System.out.println(item);
             });
         });
-
     }
 
     @Test
@@ -100,4 +135,5 @@ public class userRepositoryTest extends IncStdApplicationTests {
         Optional<User> deleteUser = userRepository.findById(1L);
         Assertions.assertFalse(deleteUser.isPresent());  // 삭제할 데이터가 존재하지 않는 경우 정상동작, 있을 경우 Error
     }
+     */
 }

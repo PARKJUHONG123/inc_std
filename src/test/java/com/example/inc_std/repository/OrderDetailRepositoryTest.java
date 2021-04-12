@@ -1,27 +1,31 @@
 package com.example.inc_std.repository;
 
 import com.example.inc_std.IncStdApplicationTests;
-import com.example.inc_std.model.entity.OrderDet;
+import com.example.inc_std.model.entity.OrderDetail;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 
-public class OrderDetRepositoryTest extends IncStdApplicationTests {
+public class OrderDetailRepositoryTest extends IncStdApplicationTests {
+
+    /*
 
     @Autowired
-    private OrderDetRepository orderDetRepository;
+    private OrderDetailRepository orderDetailRepository;
 
     @Test
     public void create() {
-        OrderDet orderDet = new OrderDet();
+        OrderDetail orderDetail = new OrderDetail();
 
-        orderDet.setOrderAt(LocalDateTime.now());
+        orderDetail.setOrderAt(LocalDateTime.now());
 //        orderDet.setUserId(4L); // 어떤 사람 // Long 에서 User 로 바뀌었기 때문
 //        orderDet.setItemId(1L); // 어떤 상품
 
-        OrderDet newOrderDet = orderDetRepository.save(orderDet);
-        Assertions.assertNotNull(newOrderDet);
+        OrderDetail newOrderDetail = orderDetailRepository.save(orderDetail);
+        Assertions.assertNotNull(newOrderDetail);
     }
+
+     */
 }

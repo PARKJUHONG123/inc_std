@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -16,11 +17,31 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String status;
+
     private String name;
+
+    private String title;
+
+    private String content;
 
     private Integer price;
 
-    private String content;
+    private String brandName;
+
+    private LocalDateTime registeredAt;
+
+    private LocalDateTime unregisteredAt;
+
+    private LocalDateTime createdAt;
+
+    private String createdBy;
+
+    private LocalDateTime updatedAt;
+
+    private String updatedBy;
+
+    /*
 
     // 1 : N
     // LAZY = 지연로딩, EAGER = 즉시로딩
@@ -35,44 +56,5 @@ public class Item {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "item")
     private List<OrderDet> orderDetList;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getPrice() {
-        return price;
-    }
-
-    public void setPrice(Integer price) {
-        this.price = price;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public List<OrderDet> getOrderDetList() {
-        return orderDetList;
-    }
-
-    public void setOrderDetList(List<OrderDet> orderDetList) {
-        this.orderDetList = orderDetList;
-    }
-
+     */
 }
