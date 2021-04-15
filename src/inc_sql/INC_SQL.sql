@@ -858,5 +858,275 @@ SELECT AGE, ROUND(AGE / 7)
     
     
 -- 메타데이터 (METHADATA)
+    -- 데이터를 위한 데이터
+    -- DB, 테이블의 스키마에 대한 정보를 저장하는 테이블
+    -- DB명, 테이블명, 칼럼명, 사용자명 등
 
+    -- 종류
+        -- 데이터 딕셔너리
+            -- 데이터베이스의 정보 저장
+            -- 시스템 카탈로그라고 함
+            -- 일반적으로 READ-ONLY
+            
+            -- 예시 (PREFIX 에 따라서 다른 정보)
+                -- USER_TABLES
+                    -- TABS
+                        -- 접속한 사용자가 소유한 테이블의 정보를 저장하는 데이터 딕셔너리
+                    -- COLS
+                        -- 접속한 사용자가 소유한 테이블들의 칼럼 정보들을 저장하는 데이터 딕셔너리
+                -- ALL_TABLES
+                -- DBA_TABLES
+                -- CBA_TABLES (컨테이너 관련 딕셔너리 : 오라클 12C에 추가됨)
+
+
+        -- 데이터 디렉토리
+            -- DBMS의 모든 데이터가 저장되는 디렉토리
+            -- DB저장, 상태 및 로그 저장
+    
 -- 케릭터셋 (CHARSET)
+    -- 문자인코딩 정보
+    -- 메타데이터의 일종
+    -- 문자열(VARCHAR, CHAR) 의 값을 저장할 때 사용되는 기본정보
+    -- DB/테이블별로 별도 설정 가능
+    
+    -- 종류
+        -- ASCII/ISO-8859-1 (아스키 계열)
+        -- EUC-KR/KSC_5601 (한글 완성형 계열)
+        -- UTF8/UNICODE (유니코드 계열)
+        -- UTF8 (오라클 기본) (1BYTE ~ 4BYTE) (한글은 3BYTE)
+        SELECT * FROM NLS_DATABASE_PARAMETERS WHERE PARAMETER = 'NLS_CHARACTERSET';
+    
+    -- ASCII
+        -- 한 자에 한 바이트 할당
+        -- DBCS (Double Byte Character Set) : 한글 완성형은 영문자/숫자 : 1Byte , 한글 : 2Byte
+        -- 나라마다 다른 언어가 있기 때문에 이를 국제 표준화한 것이 ISO-8859
+    -- 한글코드
+        -- 완성형 (1 + 7 + 8 : 글자 하나를 지정함 '강' 이라는 글자를 저장) / 조합형 (5 + 5 + 5 : ㄱ + ㅏ + ㅇ 과 같이 5비트씩 저장)
+        -- 한글의 가능한 글자 모든 조합 : 11172 자의 조합
+        -- 표준완성형 : KSC5601 / EUC-KR
+        -- MS의 확장완성형 : MS949 / CP949  
+    -- 유니코드
+        -- 전세계의 모든 글자를 가지는 문자코드
+        -- 아스키 코드를 유니코드로 변환
+        -- 유니코드 기반의 윈도우를 만들면 각 나라별로 다른 OS 를 만들 필요가 없어짐
+        -- 기본평면, 확장평면 형태 (주로 2BYTE)
+    -- UTF-8
+        -- 아스키 코드를 유니코드로 변환하는 과정에서 호환이 안되는 경우도 존재함
+        -- 유니코드의 가변길이 인코딩 (1BYTE ~ 6BYTE)
+        -- 아스키 코드와의 호환성 (1BYTE 인 경우 아스키 코드 사용)
+        -- 한글의 경우는 3BYTE
+        
+        
+-- 데이터베이스 백업
+    -- 물리 백업 : 특정 테이블만 백업하지 못하고, DB 파일 전체에 대해서 백업
+        -- 핫 백업 (오라클 서비스가 동작하는 중에 백업)
+            -- 데이터파일 복사
+                -- 전체 파일이 10GB 일 경우, 10GB 전체를 백업함
+            -- RMAN 백업 (프로그램 툴 사용)
+                -- Incremental Backup
+                    -- 전체 파일이 10GB 일 경우, 변경사항만 백업함
+                -- Cumulative Backup
+        
+        -- 콜드 백업 (오라클 서비스가 정지한 상태에서 백업)
+        
+    -- 논리 백업
+        -- 특정 테이블만 백업 가능 (SQL 을 통해서)
+        -- EXPORT / IMPORT
+        -- 오라클 10G 이상부터는 DATAPUMP (프로그램 툴)
+            -- 고속백업
+            -- 기존 백업툴과 호환 불가 (기존 EXP 툴로 백업했을 때, DATAPUMP 사용 불가)
+
+        -- 전체 백업 (예시)
+        EXP USERID = HR/HR FILE = './HR.DUMP' FULL = Y
+
+        -- HR 스키마를 백업하시오 (유저 아이디를 지정하고, 저장되어서 생성될 파일의 위치와 이름을 정해줌) (예시)
+        EXP USERID = HR/HR FILE = './HR.DUMP'
+
+
+-- 데이터베이스 복원
+    -- [조건] DB 생성하고, TABLESPACE 생성하고, 계정 생성 및 TABLESPACE 접근 권한을 추가해야 함
+    -- 이 후에 IMP 명령어를 통해 IMPORT 해줘야 함
+
+    -- HR 스키마를 복원하시오 (예시)
+    IMP USERID = HR/HR FILE = './HR.DUMP'
+    
+    
+-- 데이터베이스 로그
+    -- REDO LOG
+        -- DML/DDL 실행할 경우 기록됨
+        -- 장애 발생 시 파일 참고해서 복구
+        -- DML 자체는 저장하지 않고, 변경 사항에 대해 기록
+        -- DDL 의 경우는 문장 자체와 변경 사항을 기록
+
+        -- REDO 로그를 보는 방법
+        ALTER SYSTEM SWITCH LOGFILE
+        DESC v$log; -- 어떤 로그들이 ACTIVE, CURRENT, INACTIVE 상태인지
+        DESC v$logfile; -- 로그의 ID 와 파일 위치 및 이름
+        
+    -- ALERT LOG
+        -- 백그라운드 프로세스 작업로그, 에러 발생 시 남겨짐
+    
+    -- ARCHIVE LOG
+        -- 유효기간이 끝난 REDO 의 논리적인 복사본
+    
+    -- TRACE FILES
+        -- ALTER SESSION SET SQL_TRACE = TRUE
+        -- CPU, 메모리, DISK I/O 에 대한 실행결과를 남김
+        -- SQL 튜닝 시 필요함
+        
+        
+-- 파티셔닝/샤닝
+    -- 데이터베이스 파티셔닝 (PARTITIONING)
+        -- VLDB (VERY LARGE DBMS)
+            -- 전체 DB가 하나의 DBMS 시스템에 다 들어가기 힘들어지는 경우
+            -- 테이블들을 여러 개의 군으로 나눠서 분산 저장
+            -- 하나의 테이블이 방대한 경우에는 사전방식 (a-m, n-r, s-z) 와 같이 나눠서 저장
+        
+        -- 종류        
+            -- 파티셔닝 (PARTITIONING)
+                -- DBMS 레벨에서의 분할
+                
+            -- 샤딩 (SHARDING)
+                -- DBMS 외부에서 분할 / 응용레벨에서 구별해야 함
+            
+        -- 제약사항 발생 (CONSTRAINTS)
+            -- 테이블 단위 연산이 힘들어짐 (비용 문제)
+                -- 조인연산 어려움 -> 정규화 (NORMALIZATION) 문제
+                -- 역정규화 (DENORMALIZATION) -> 중복허용으로 해결
+            -- 외래키 (FK) 의 효용 문제
+                -- 레고드 추가 시 참조 무결성 조건 체크 -> 시스템 부담증가로 수동전환
+                -- CRUD 시 위치 (LOCATION) 를 인식해야 함 (파티셔닝 / 샤딩의 차이점)
+                
+        -- 이점 (BENEFITS)
+            -- 데이터 전체 검색 시 필요한 부분만 탐색해서 성능 증가
+            -- 전체 데이터를 손실할 가능성이 줄어듬 (가용성 향상)
+            -- 파티션별 백업/복구 가능
+            -- 파티션 단위로 I/O 분산 가능 (업데이트 성능 증가 : 주로 샤딩의 성능이 좋아짐)
+            
+        -- 방식
+            -- 범위 (RANGE) : A~M / N~R / S~Z [연속적인 경우]
+            -- 해시 (HASH) : HASH 함수 파티션별로 크기를 비슷하게 나눔 [거의 비슷하게 나뉘어짐]
+            -- 리스트 (LIST) : 특정한 칼럼을 기준 [비연속적인 경우]
+            -- 컴포지트 (COMPOSITE) : RANGE-HASH / RANGE-LIST
+            -- 인터벌 (INTERVAL) : RANGE 파티션에서 MAXVALUE 파티션 없이 지정된 인터벌 수를 가지는 파티션이 생성
+            -- 레퍼런스 (REFERENCE) : 부모와 1:1 관계의 자식 테이블 파티션할 때 사용함
+            
+            
+        -- BUSINESSCARD 테이블에 연도 (CREATETIME) 칼럼을 추가하고 파티셔닝하시오
+        CREATE TABLE BUSINESSCARD (ID INT NOT NULL, NAME VARCHAR2(255), ADDRESS VARCHAR2(255), TELEPHONE VARCHAR2(255), CREATETIME DATE)
+        PARTITION BY RANGE (
+            YEAR(CREATETIME)) (
+                                PARTITION P0 VALUE LESS THAN (2013),
+                                PARTITION P1 VALUE LESS THAN (2014),
+                                PARTITION P2 VALUE LESS THAN (2015),
+                                PARTITION P3 VALUE LESS THAN MAXVALUE
+                              );
+                              
+        -- 파티션 추가
+        ALTER TABLE BUSINESSCARD
+          ADD PARTITION (
+                          PARTITION P4 VALUE LESS THAN (2005)
+                        );
+        
+        -- 파티션 삭제
+        ALTER TABLE BUSINESSCARD
+         DROP PARTITION P4;
+         
+        -- 파티션 분할
+        ALTER TABLE BUSINESSCARD
+         REORGANIZE PARTITION P3 INTO (
+                                      PARTITION P3 VALUE LESS THAN (2015),
+                                      PARTITION P4 VALUE LESS THAN MAXVALUE
+                                      );
+        
+        -- 파티션 병합
+        ALTER TABLE BUSINESSCARD
+         REORGANIZE PARTITION P2, P3 INTO (
+                                          PARTITION P23 VALUE LESS THAN (2014)
+                                          );
+
+
+-- 데이터베이스 복제
+    -- DBMS 의 내용을 복제해 동일한 DB 내용을 유지
+    -- 두 개 이상의 DBMS 시스템을 마스터 / 슬레이브로 나눠서 마스터 DBMS -> 슬레이브 DBMS 로 SQL 쿼리 복제 (SELECT 제외)
+        -- 데이터 업데이트 (CUD) 는 마스터에서 진행
+        -- 읽기 (R) 은 슬레이브에서 진행
+    -- 읽기 성능 향상 (Read Scalability : 슬레이브가 한 개가 아니라, 여러 개로 늘어날 수록 사용자들을 여러 슬레이브 DB로 분산해서 읽을 수 있게 함)
+    -- 고가용성 (HA : High Availability) 지원 (복제를 했기 때문에 다른 DBMS 에서 에러가 발생해도 읽는 것에는 문제가 없음)
+    -- 오라클에서는 RAC (Real Application Clusters) 라는 기능으로 불림 (= Oracle Parallel Server)
+    -- 오라클 데이터가드 (Oracle Dataguard : Active 와 StandBy 를 구분함) 와 다른 기능
+    -- 최소 두 개 이상의 오라클 서버 필요 (가상화 시스템 또는 물리 서버)
+    
+    
+-- 오라클 12C
+    -- 멀티테넌트 (Multi-Tenant) 아키텍처
+        -- 하나의 CDB (Container DB) 에 여러 개의 PDB (Pluggable DB) 를 생성 관리
+        -- 하나의 컨테이너에 여러 개의 DB 종속
+        
+        -- 구조
+            -- 루트 (Root) 컨테이너 (CDB$ROOT)
+                -- 공통사용자 + 오라클이 제공하는 메타데이터
+                -- 컴퓨터
+            -- 시드 (Seed) 컨테이너 (PDB$SEED)
+                -- 새로운 PDB를 생성할 때 사용하는 템플릿
+                -- USB
+            -- PDB 컨테이너
+                -- 기존의 생성했던 DB에 해당
+                -- USB 내 데이터
+                
+            -- 하나의 컨테이너 DB (CDB) 에 여러 개의 Pluggalbe DB (PDB) 를 넣을 수 있다
+            -- PDB 를 생성하는 과정에서 기본 템플릿에 해당하는 SEED 를 기반으로 생성한다
+            -- 구성방식 : KEY/VALUE, ORDERED KEY/VALUE, DOCUMENT-BASED
+                
+                
+        -- 작업 자원 관리 (Workload Resource Management)
+            -- PDB 별로 우선순위 할당 (상/중/하)
+            -- PDB 별로 리소스 공유 (1/N : 각 PDB별로 전체 WORKLOAD 를 SHARE 할 수 있음)
+        -- 백업/복구
+            -- CDB / PDB 단위로 가능함
+
+        -- 메타데이터 (DICTIONARY VIEW)
+            -- CDB_
+                -- 모든 컨테이너에 존재하는 오브젝트
+            -- DBA_
+                -- 현재 컨테이너에 존재하는 오브젝트
+            -- ALL_
+                -- 현재 컨테이너에 현재 사용자가 접근 가능한 오브젝트
+            -- USER_
+                -- 현재 컨테이너에 현재 사용자가 생성한 오브젝트
+            
+
+    -- DECODE(기존 값, 조건, 대체 값)
+    -- ROWNUM (오라클 내부적으로 가상컬럼을 가지고 있음 : 1부터 시작)
+        -- ROWID : 고유 줄 번호
+        -- ROWNUM : 결과물 출력라인번호
+        -- 일부만 출력하려면 ROWNUM 사용
+    
+    -- 휴지통
+        -- 오라클 10G 부터 휴지통 지원
+        -- 테이블 삭제 시 삭제되지 않고 별도의 휴지통에 들어감
+        
+        -- 휴지통 비우기
+        PURGE RECYCLEBIN;
+        
+        -- 휴지통 보기
+        SHOW RECYCLEBIN;
+        
+        -- 삭제 취소
+        FLASHBACK TABLE TABLE_NAME TO BEFORE DROP;
+        
+        -- 삭제 시 휴지통에 안 넣기
+        DROP TABLE TABLE_NAME PURGE;
+
+-- 트랜잭션
+
+-- LOCK
+
+    
+    
+    
+    
+    
+    
+    
+    
