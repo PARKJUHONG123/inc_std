@@ -1,9 +1,6 @@
 package com.example.inc_std.model.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -15,30 +12,33 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Data
 @Entity
+@ToString(exclude = {"itemList", "category"})
 @EntityListeners(AuditingEntityListener.class) // 클래스가 LoginUserAuditorAware 에 의해 감시받음
 
 @Builder // 생성자 Pattern 으로, 원하는 만큼의 파라미터를 가진 생성자 생성가능
 @Accessors(chain = true) // chaining 된 형태로 객체를 생성할 수 있음
-public class Item {
+public class Partner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String status;
-
     private String name;
 
-    private String title;
+    private String status;
 
-    private String content;
+    private String address;
 
-    private Integer price;
+    private String callCenter;
 
-    private String brandName;
+    private String partnerNumber;
+
+    private String businessNumber;
+
+    private String ceoName;
 
     private LocalDateTime registeredAt;
 
@@ -57,29 +57,12 @@ public class Item {
     private String updatedBy;
 
 
-    /*
-
-    // 1 : N
-    // LAZY = 지연로딩, EAGER = 즉시로딩
-
-    // LAZY = SELECT * FROM ITEM WHERE ID = ?
-
-    // EAGER (1 : 1 연관 관계일 때 사용함)
-    // ITEM_ID = ORDER_DETAIL.ITEM_ID
-    // USER-ID = ORDER_DETAIL.USER_ID
-    // 연관 관계가 이루어진 모든 테이블에 대해서 조인을 걸어서 가져옴
-    // FetchType 중 EAGER 타입은 연관관계로 설정된 모든 테이블에 대해서 Join이 일어나고, 모든 데이터를 가져오기 때문에 성능의 저하와 데이터를 가져오지 못하는 이슈가 생길 수 있음
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "item")
-    private List<OrderDet> orderDetList;
-
-     */
-
-    // private Long partnerId;
-    // Item N : 1 Partner
+    // private Long categoryId;
     @ManyToOne
-    private Partner partner;
+    private Category category;
 
-    // Item 1 : N OrderDetail
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "item")
-    private List<OrderDetail> orderDetailList;
+    // Partner 1 : N Item
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "partner")
+    private List<Item> itemList;
+
 }
