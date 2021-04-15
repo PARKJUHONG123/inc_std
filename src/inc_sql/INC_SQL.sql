@@ -1118,15 +1118,166 @@ SELECT AGE, ROUND(AGE / 7)
         -- 삭제 시 휴지통에 안 넣기
         DROP TABLE TABLE_NAME PURGE;
 
--- 트랜잭션
+-- 트랜잭션 (Transaction)
+    -- 복수의 SQL 문을 수행하는 도중 (EX. 은행 간의 이체) 에 장애가 발생했을 때 장애에 대응할 수 있도록 하는 기능
+    -- 전체 수행 (COMMIT) 과 전체 취소 (ROLLBACK) 두 가지의 결과값만 가져야 함
+    -- SAVEPOINT 명령어까지 ROLLBACK 할 수 있음
+    -- AUTOCOMMIT 이 되는 경우
+        -- DDL / DCL 명령문
+        -- 오라클이 정상종료가 된 경우
+
+    -- ACID 특성
+        -- Atomatic (원자성)
+            -- 전체적으로 수행이 되던지, 안되던지 해야 함 (All or Nothing)
+        -- Consistency (일관성)
+            -- 트랜잭션 전후에 데이터가 손상을 받으면 안됨
+            -- 같은 데이터가 다른 값을 가지면 안됨
+        -- Isolation (고립성 / 격리수준)
+            -- 여러 개의 트랜잭션이 수행될 때 성능과 데이터 안정성 간의 TRADE-OFF
+        -- Durability (지속성)
+            -- 트랜잭션이 종료된 이후에도 데이터에 문제가 없어야 함 (장시간)
+
+    -- SAVEPOINT
+    CREATE TABLE BC(NAME VARCHAR2(255));
+    INSERT INTO BC VALUES("BOB");
+    SAVEPOINT C1;
+    DELETE FROM BC; -- 레코드 삭제
+    ROLLBACK TO C1; -- DDL 
+
+    -- LOCAL TRANSACTION (로컬 트랜잭션)
+        -- 동일한 시스템 안에서의 트랜잭션
+        -- DBMS 가 보장하는 경우가 많음
+        -- A은행의 1번 계좌에서 A은행의 2번 계좌로 전송하는 경우
+        -- 전송하는 과정을 DBMS 내에서 ROLLBACK 할 수 있음
+        
+    -- GLOBAL TRANSACTION (글로벌 트랜잭션)
+        -- 분산 트랜잭션
+        -- 서로 다른 시스템에서의 트랜잭션
+        -- DBMS 외부의 미들웨어 / WAS 가 보장
+        -- A은행의 1번 계좌에서 B은행의 2번 계좌로 전송하는 경우
+        -- 전송하는 과정을 WAS나 미들웨어가 취소해줘야 함
 
 -- LOCK
+    -- 공유자원 (리소스) 에 대해 여러 개의 트랜잭션이 접근하려고 경쟁하려고 할 때 제어하는 방법
+        -- 동시성 제어 (Concurrency Control) 라고 하고 보통 Lock 으로 해결
+        -- 프로그래밍에서는 동기화 (Synchronization)
+    -- 일관성 (Consistency) 과 무결성 (Integrity) 을 지키기 위해 적용
+    
+    -- Lock Granularity
+        -- 글로벌 락 (Global Lock)
+            -- 특정 트랜잭션이 수행되면 다른 트랜잭션이 모두 정지하는 경우
+            -- 데이터베이스 덤프의 경우, 
+                -- 일반 백업 : 서비스가 정지된 상태에서 백업
+                -- 고급 백업 : 서비스가 동작하는 상태에서 백업 (격리의 문제 발생 - 백업 중 업데이트가 되면 어느 상태를 백업해야 할까?)
+                    -- Read Uncommited : 트랜잭션이 종료되지 않은 상태의 대상 데이터를 읽어감 (트랜잭션이 종료되면 데이터 값이 변경될 수 있음 = 현재값을 일단 참고하지만 최종값은 변경될 수 있음) (EX. 아직 개표가 끝나지 않은 득표현황)
+                    -- Read Commited : 트랜잭션이 종료된 상태의 데이터만을 읽음 = 현재 트랜잭션이 진행되면서 데이터를 참고할 때 다른 트랜잭션에서는 작업이 종료된 데이터만을 읽음 (= 트랜잭션이 동일한 쿼리를 여러 번 수행시킬 때 쿼리값이 달라질 수 있음)
+                    -- Repeatable Read : 백업이 시작되는 시점 전의 업데이트 내역만 적용함 (= 트랜잭션이 진행되는 도중에 쿼리를 반복수행하더라도 결과값은 계속 동일해야 함)
+                    -- Serializable : 데이터 값에 문제가 생기는 경우가 아예 발생하지 않게 끔 트랜잭션끼리 겹치지 않음 (성능 낮음)
 
+        -- 테이블 단위 락 (Table Lock)
+            -- 동일한 테이블을 다른 트랜잭션이 사용하고 있다면 접근 금지
+            
+        -- 줄단위 락 (Row Lock)
+            -- 동일한 줄 (Row) 만 접근 금지
+    
+
+
+-- PL/SQL
+    -- Oracle's Procedure Language Extension to SQL
+    -- 기존의 비절차적인 SQL 문에서 절차지향적인 성격을 더함
+    -- 변수 정의, 조건문, 반복문 등을 지원
+    -- 블럭구조, 자체 컴파일 가능
+    -- DECLARE 를 사용해서 정의
+    
+    -- 유형
+        -- ANONYMOUS
+            DECLARE
+            BEGIN
+            EXCEPTION
+            END
+            
+        -- PROCEDURE
+            PROCEDURE PROCEDURE_NAME IS
+            BEGIN
+            EXCEPTION
+            END
+        
+        -- FUNCTION
+            FUNCTION FUNCTION_NAME RETURN DATATYPE IS
+            BEGIN
+                RETURN VALUE;
+            EXCEPTION
+            END
+
+
+-- 저장 프로시저 (STORED PROCEDURE)
+    -- SQL을 함수 형태로 저장하고 사용하는 방법 (Static SQL)
+    -- 이미 컴파일되어 있어서 성능이 빠름
+    
+    -- 저장 프로시저 정의
+    CREATE PROCEDURE PROCEDURE_NAME(PARAMTER PARAMTER_TYPE, ...)
+    BEGIN
+        -- SQL 문장들
+    END
+    
+    -- 저장 프로시저 호출
+    EXECUTE PROCEDURE_NAME;
+    
+    -- 저장 프로시저 삭제
+    DROP PROCEDURE PROCEDURE_NAME;
+    
+
+    -- [예시] EMP 테이블의 SAL 값을 10% 인상하는 저장 프로시저
+    CREATE OR REPLACE PROCEDURE INCREASE_SAL (EMPNO_IN IN NUMBER) IS
+    BEGIN
+        UPDATE EMP
+           SET SAL = SAL * 1.1
+         WHERE EMPNO = EMPNO_IN;
+        COMMIT;
+    END INCREASE_SAL; -- END 뒤에 프로시저 이름은 생략 가능
+    
+    EXECUTE INCREASE_SAL(7369);
     
     
+    -- [예시] EMP 테이블의 레코드 갯수를 리턴하는 함수
+    CREATE OR REPLACE FUNCTION COUNT_RECORD (V_SAMPLE IN NUMBER) RETURN NUMBER IS
+    V_COUNT NUMBER; -- 내부 변수 선언
+    BEGIN
+        SELECT COUNT(*)
+          INTO V_COUNT
+          FROM EMP;
+        RETURN V_COUNT;
+    END COUNT_RECORD;
+    /
     
+    VAR SAMPLE NUMBER;
+    EXECUTE :SAMPLE := COUNT_RECORD(1);
+    PRINT SAMPLE;
     
+ -- 트리거 (TRIGGER)    -- 특정한 조건이 되면 자동으로 호출되는 저장 프로시저 (EX. 레코드가 삭제되면 자동으로 참조무결성을 체크하는 트리거)
     
+    -- 트리거 정의
+    CREATE TRIGGER TRIGGER_NAME BEFORE (또는 AFTER) CRUD ON TABLE_NAME
+    (FOR EACH ROW)
+    BEGIN
+        변경 전 (OLD.칼럼명) 또는 변경 후 (NEW.칼럼명) 을 이용한 처리
+    END
     
+    -- 트리거 삭제
+    DROP TRIGGER TRIGGER_NAME;
     
+    -- [예시] EMP 테이블의 레코드가 추가될 때마다 간단한 메세지를 출력하시오
+    CREATE OR REPLACE TRIGGER INSERT_TRIGGER
+    BEFORE INSERT ON EMP
+    FOR EACH ROW
     
+    DECLARE
+    BEGIN
+        DBMS_OUTPUT.PUT_LINE('HELLO');
+    END;
+    /
+    
+    SET SERVEROUTPUT ON;
+    INSERT INTO EMP (EMPNO, ENAME, SAL)
+             VALUES (1000, 'HA', 1000);
+ 
