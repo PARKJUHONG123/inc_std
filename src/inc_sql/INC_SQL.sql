@@ -1196,13 +1196,13 @@ SELECT AGE, ROUND(AGE / 7)
             EXCEPTION
             END
             
-        -- PROCEDURE
+        -- PROCEDURE (리턴값 없음)
             PROCEDURE PROCEDURE_NAME IS
             BEGIN
             EXCEPTION
             END
         
-        -- FUNCTION
+        -- FUNCTION (리턴값 있음)
             FUNCTION FUNCTION_NAME RETURN DATATYPE IS
             BEGIN
                 RETURN VALUE;
@@ -1213,6 +1213,9 @@ SELECT AGE, ROUND(AGE / 7)
 -- 저장 프로시저 (STORED PROCEDURE)
     -- SQL을 함수 형태로 저장하고 사용하는 방법 (Static SQL)
     -- 이미 컴파일되어 있어서 성능이 빠름
+    -- SQL 인터프리터를 거치지 않고 미리 컴파일하는 (PRE-COMPILE) 하는 방식으로 DBMS에 저장
+    -- 동일한 쿼리를 가지는 저장프로시저가 인자만 다르게 계속 수행되는 상황에서 효율이 높음
+    -- Static SQL 로 일반적인 Dynamic SQL 보다 성능이 좋음
     
     -- 저장 프로시저 정의
     CREATE PROCEDURE PROCEDURE_NAME(PARAMTER PARAMTER_TYPE, ...)
@@ -1224,8 +1227,7 @@ SELECT AGE, ROUND(AGE / 7)
     EXECUTE PROCEDURE_NAME;
     
     -- 저장 프로시저 삭제
-    DROP PROCEDURE PROCEDURE_NAME;
-    
+    DROP PROCEDURE PROCEDURE_NAME;    
 
     -- [예시] EMP 테이블의 SAL 값을 10% 인상하는 저장 프로시저
     CREATE OR REPLACE PROCEDURE INCREASE_SAL (EMPNO_IN IN NUMBER) IS
@@ -1237,8 +1239,9 @@ SELECT AGE, ROUND(AGE / 7)
     END INCREASE_SAL; -- END 뒤에 프로시저 이름은 생략 가능
     
     EXECUTE INCREASE_SAL(7369);
-    
-    
+
+
+-- 함수 (FUNCTION)
     -- [예시] EMP 테이블의 레코드 갯수를 리턴하는 함수
     CREATE OR REPLACE FUNCTION COUNT_RECORD (V_SAMPLE IN NUMBER) RETURN NUMBER IS
     V_COUNT NUMBER; -- 내부 변수 선언
@@ -1254,8 +1257,8 @@ SELECT AGE, ROUND(AGE / 7)
     EXECUTE :SAMPLE := COUNT_RECORD(1);
     PRINT SAMPLE;
     
- -- 트리거 (TRIGGER)    -- 특정한 조건이 되면 자동으로 호출되는 저장 프로시저 (EX. 레코드가 삭제되면 자동으로 참조무결성을 체크하는 트리거)
-    
+
+-- 트리거 (TRIGGER)    -- 특정한 조건이 되면 자동으로 호출되는 저장 프로시저 (EX. 레코드가 삭제되면 자동으로 참조무결성을 체크하는 트리거)
     -- 트리거 정의
     CREATE TRIGGER TRIGGER_NAME BEFORE (또는 AFTER) CRUD ON TABLE_NAME
     (FOR EACH ROW)
@@ -1280,4 +1283,83 @@ SELECT AGE, ROUND(AGE / 7)
     SET SERVEROUTPUT ON;
     INSERT INTO EMP (EMPNO, ENAME, SAL)
              VALUES (1000, 'HA', 1000);
- 
+
+
+-- 대형 데이터베이스 구축기술
+    -- 데이터는 계속 늘어남 : 한 대의 DBMS 서버로는 처리능력의 한계
+    -- 1. 성능 업그레이드
+        -- HDD -> SSD -> 인 메모리 머신 (IN-MEMORY-MACHINE)
+    
+    -- 2. 샤딩 (SHARDING)
+        -- DBMS 내용을 분할 (DB/테이블)
+        -- 쓰기 (WRITE) 성능 향상 [Write Scalability 향상]
+        -- 중복허용 : Denormalize = Location 이 고려되기 때문에 Join 이 어려워짐 = 서로 다른 DBMS 서버이기 때문 = 중복과 위치 투명성을 포기하는 대신
+        -- 게임에서 월드를 구분해서 운영하는 방식과 동일 (각 월드마다 하나의 DB)MMV
+        
+    -- 3. 복제 (REPLICATION)
+        -- 동일한 DBMS 를 여러 개 유지 (MASTER/SLAVE)
+        -- 읽기 성능 향상 [Read Scalability 향상]
+        -- DB#1(M) : CUD / DB#2(S) : R
+        -- 포털 사이트에서 많이 사용함
+        
+    -- 스케일 업 (Scale-Up)
+        -- 보통 말하는 업그레이드를 말함
+        -- CPU 클럭 속도 증가, 코어 수 증가, 메모리 증가
+        -- 보통 성능증가에 비해 가격 증가가 더 빠름 (비용부담)
+        -- 병렬 컴퓨팅(Parallel Computing) / 전용 네트워크
+        -- Tiglely-Coupled System
+        
+    -- 스케일 아웃 (Scale-Out)
+        -- 동일한 서버/DBMS 를 병렬로 구축
+        -- 분산 컴퓨팅 (Distributed Computing)
+        -- Loosely Coupled System - 상대적으로 저렴
+        -- 노드 수를 추가하여 계속 성능 향상 가능 (효율은 상대적으로 떨어짐)
+        
+  -- NoSQL
+    -- Not Only SQL
+    -- 일반 RDBMS (B-TREE : INDEX 검색) 가 주로 읽기/검색 성능에 최적화
+    -- 쓰기 성능이 중요한 응용의 경우 좋은 성능을 보이는 경우가 많음
+        -- 로그를 기록하는 시스템들은 읽기보다 쓰기가 더 중요함 (일반적인 RDBMS 에서는 인덱스를 삭제하는 것밖에 없지만, NoSQL 을 사용함으로써 쓰기가 더 빠름)
+        -- 로그 머신, SNS 메신저 (밴드, 카카오톡 등)
+    -- 기존 RDBMS 를 완전히 대체하는 것이라기 보단느 보완재의 역할
+    -- 특정 기술을 말하는 것이 아니라 일련의 제품군을 가리킴
+    -- 제품군
+        -- MongoDB, Apache Cassandra, Apache HBASE, Redis 등
+
+    -- CAP 이론
+        -- C (Consistency : 일관성)
+            -- 어떤 노드를 접근하더라도 데이터 값이 동일해야 함
+        -- A (Availability : 가용성)
+            -- 노드 일부가 FAIL 되더라도 서비스가 중단이 안되어야 함
+            -- 네이버의 수 만대 서버 중 몇 개의 서버가 죽더라도 서비스는 깨지면 안됨
+        -- P (Partition Tolerance : 파티션 내성)
+            -- 노드 간 통신에 장애가 생겨도 문제가 없어야 함
+
+    -- CAP 이론을 이용한 NoSQL 시스템 분류
+        -- 어떤 시스템도 3가지 모두를 만족시킬 수 없다
+            -- CA : 일반 RDBMS
+            -- CP : Hbase, MongoDB, Redis
+            -- AP : Cassandra
+    
+    -- 저장 형태에 대한 분류
+        -- KEY/VALUE
+            -- 키 값을 주면 밸류를 리턴하는 형태
+            -- JSON 과 유사한 형태, Redis
+        
+        -- ORDERED KEY/VALUE
+            -- 키 값으로 정렬되는 형태
+            -- Hadoop, Cassandra, HBase
+        
+        -- DOCUMENT BASED
+            -- 벨류 값이 JSON/XML 문서인 형태
+            -- MongoDB
+            
+    -- 스키마리스 (Schemaless)
+        -- 스키마 (DDL) 기반이 아니라 필요하면 새로운 컬럼 (키) 를 추가하면 됨
+        -- 전체적으로 동일한 구조가 아닐 수 있음
+        
+        -- RDMBS : 정규형 데이터 (EX. INSERT 할 때 EMAIL 칼럼에 해당되는 값이 없으면 NULL)
+        -- NoSQL : 반정규형 데이터 (Semi) (EX. INSERT 할 때 EMAIL 칼럼에 해당되는 값이 없어도 가능 = 데이터가 필요할 경우 스키마가 없어도 사용 가능함)
+        -- 검색엔진 : 비정규형 데이터 (Plain Text) (EX. 스키마 즉 형식이 없음)
+        
+        
