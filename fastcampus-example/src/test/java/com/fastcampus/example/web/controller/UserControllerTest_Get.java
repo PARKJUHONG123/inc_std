@@ -45,7 +45,7 @@ public class UserControllerTest_Get extends AbstractMockMvcTestBoilerplate {
     @Test
     @DisplayName("탈퇴한 회원이 본인 정보를 조회하려할때, 403 ACCESS_DENIED 를 응답한다")
     void fail_403__when__탈퇴한_회원일떄() throws Exception {
-        mvc.perform(get("/users/me").he ader(USER_HEADER, 6))
+        mvc.perform(get("/users/me").header(USER_HEADER, 6))
                 .andExpect(status().is(HttpStatus.FORBIDDEN.value()))
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(jsonPath("$.error_code").value("ACCESS_DENIED"))

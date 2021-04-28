@@ -4,10 +4,12 @@ import com.fastcampus.example.domain.BaseEntity;
 import com.fastcampus.example.domain.type.SalesStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 
+@Setter
 @Getter
 @Entity
 @DynamicUpdate
